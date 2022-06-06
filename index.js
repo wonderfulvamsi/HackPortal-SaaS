@@ -73,7 +73,7 @@ app.get('/getfile/:filename', async (req, res) => {
 })
 
 const uri = process.env.ATLAS_URI;
-mongoose.connect(uri, { useNewUrlParser: true });
+mongoose.connect(uri,);
 const connection = mongoose.connection;
 connection.once('open', () => {
     console.log("MongoDB database connection established successfully");
