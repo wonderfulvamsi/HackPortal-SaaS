@@ -1,0 +1,26 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "web2 backend for hackportal",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "web2",
+    "web3",
+    "mern"
+  ],
+  "author": "wonderful vamsi",
+  "license": "ISC",
+  "dependencies": {
+    "aws-sdk": "^2.1148.0",
+    "bcrypt": "^5.0.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.0.1",
+    "express": "^4.18.1",
+    "mongoose": "^6.3.5",
+    "multer": "^1.4.5-lts.1",
+    "nodemon": "^2.0.16"
+  }
+}
