@@ -94,4 +94,74 @@ router.patch('/votencmt', async (req, res) => {
     }
 })
 
+//adding users to judge coin holders list         
+router.patch('/addjudge', async (req, res) => {
+    try {
+        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        let newjudge_coin_holders = event.judge_coin_holders;
+        newjudge_coin_holders.push(req.body.newjudge);
+        res.status(200).json(await event.updateOne({
+            judge_coin_holders: newjudge_coin_holders
+        }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+//adding users to competitor coin holders list
+router.patch('/addcompetitor', async (req, res) => {
+    try {
+        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        let newcompetitor_coin_holders = event.competitor_coin_holders;
+        newcompetitor_coin_holders.push(req.body.newcompetitor);
+        res.status(200).json(await event.updateOne({
+            competitor_coin_holders: newcompetitor_coin_holders
+        }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+//adding users to people coin holders list 
+router.patch('/addpeople', async (req, res) => {
+    try {
+        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        let newpeople_coin_holders = event.people_coin_holders;
+        newpeople_coin_holders.push(req.body.newpeople);
+        res.status(200).json(await event.updateOne({
+            people_coin_holders: newpeople_coin_holders
+        }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+//creating a visible profile
+router.patch('/makevisible', async (req, res) => {
+    try {
+        const curruser = await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, user_wallet_id: req.body.user_wallet_id });
+        res.status(200).json(await curruser.updateOne({
+            need_team: req.body.need_team,
+            visible_profile: req.body.visible_profile,
+            user_name: req.body.user_name,
+            institute: req.body.institute,
+            mobileno: req.body.mobileno,
+            email: req.body.email,
+            linkedin_url: req.body.linkedin_url,
+            github_url: req.body.github_url,
+            portfolio_url: req.body.portfolio_url,
+            bio: req.body.bio,
+            skills: req.body.skills,
+            ideas: req.body.ideas,
+        }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+
 module.exports = router;

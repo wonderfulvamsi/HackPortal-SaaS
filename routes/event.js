@@ -2,6 +2,8 @@ const router = require('express').Router();
 
 let EventData = require('../models/eventModel');
 
+let UserData = require('../models/userModel');
+
 let TeamData = require('../models/teamModel');
 
 let SubmissionData = require('../models/submissionModel');
@@ -28,8 +30,7 @@ router.post('/create', async (req, res) => {
             judges: req.body.judges,
             sponsors: req.body.sponsors,
             timeline: req.body.timeline,
-            teams: req.body.teams,
-            announcemts: req.body.announcemts
+            teams: req.body.teams
         });
         res.status(200).json(await newevent.save())
     }
@@ -110,6 +111,26 @@ router.get('/allsubmissions', async (req, res) => {
 router.get('/submissioninfo', async (req, res) => {
     try {
         res.status(200).json(await SubmissionData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, team_leader_wallet_id: req.body.team_leader_wallet_id }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+//get all visible profiles
+router.get('/allvisibleprofiles', async (req, res) => {
+    try {
+        res.status(200).json(await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, visible_profile: true }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+//get a user profile 
+router.get('/allvisibleprofiles', async (req, res) => {
+    try {
+        res.status(200).json(await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, user_wallet_id: req.body.user_wallet_id }));
     }
     catch (err) {
         res.status(500).json(err)

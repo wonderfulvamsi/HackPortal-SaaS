@@ -14,7 +14,10 @@ const eventSchema = new Schema({
     judges: { type: Array }, //a array of json with judge details feilds
     sponsors: { type: Array }, // a array of json with sponsor details
     timeline: { type: Array, required: true }, // a array of json with date, stage and disc as feilds
-    teams: { type: Array }
+    teams: { type: Array },
+    judge_coin_holders: { type: Array },
+    competitor_coin_holders: { type: Array },
+    people_coin_holders: { type: Array }
 }
 );
 
