@@ -22,6 +22,15 @@ router.post('/newuser', async (req, res) => {
     }
 })
 
+//get user profile
+router.get('/userinfo', async (req, res) => {
+    try {
+        res.status(200).json(await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, user_wallet_id: req.body.user_wallet_id }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
 
 //add submission
 router.post('/addsubmission', async (req, res) => {

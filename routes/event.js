@@ -127,14 +127,5 @@ router.get('/allvisibleprofiles', async (req, res) => {
     }
 })
 
-//get a user profile 
-router.get('/allvisibleprofiles', async (req, res) => {
-    try {
-        res.status(200).json(await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, user_wallet_id: req.body.user_wallet_id }));
-    }
-    catch (err) {
-        res.status(500).json(err)
-    }
-})
 
 module.exports = router;
