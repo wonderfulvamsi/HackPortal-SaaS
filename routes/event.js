@@ -12,7 +12,7 @@ require('dotenv').config();
 
 //get event info
 router.get('/info', async (req, res) => {
-    res.status(200).json(await EventData.findOne({ event_name: req.body.event_name }));
+    res.status(200).json(await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id }));
 })
 
 //create an event
@@ -42,7 +42,7 @@ router.post('/create', async (req, res) => {
 //update event 
 router.patch('/updateevent', async (req, res) => {
     try {
-        const event = await EventData.findOne({ event_name: req.body.event_name });
+        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
         res.status(200).json(await event.updateOne(
             {
                 event_name: req.body.event_name,
@@ -79,8 +79,7 @@ router.delete('/delevent', async (req, res) => {
 //get all teams of an event
 router.get('/allteams', async (req, res) => {
     try {
-        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
-        res.status(200).json(await event.teams);
+        res.status(200).json(await TeamData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id }));
     }
     catch (err) {
         res.status(500).json(err)

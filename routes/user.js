@@ -12,6 +12,8 @@ require('dotenv').config();
 router.post('/newuser', async (req, res) => {
     try {
         const newuser = new UserData({
+            organizer_wallet_id: req.body.organizer_wallet_id,
+            event_name: req.body.event_name,
             user_wallet_id: req.body.user_wallet_id,
             user_type: req.body.user_type,
         });
