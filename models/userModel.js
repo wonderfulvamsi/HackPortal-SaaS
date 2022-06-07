@@ -17,8 +17,8 @@ const userSchema = new Schema({
     github_url: { type: String },
     portfolio_url: { type: String },
     bio: { type: String },
-    skills: { type: String },
-    idea: { type: Array }
+    skills: { type: Array },
+    ideas: { type: Array }
 }
 );
 

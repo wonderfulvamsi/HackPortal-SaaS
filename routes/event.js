@@ -45,7 +45,7 @@ router.patch('/updateevent', async (req, res) => {
         const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
         res.status(200).json(await event.updateOne(
             {
-                event_name: req.body.event_name,
+                event_name: req.body.event_new_name,
                 event_logo: req.body.event_logo,
                 event_wall_pic: req.body.event_wall_pic,
                 event_link: req.body.event_link,
@@ -79,7 +79,7 @@ router.delete('/delevent', async (req, res) => {
 //get all teams of an event
 router.get('/allteams', async (req, res) => {
     try {
-        res.status(200).json(await TeamData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id }));
+        res.status(200).json(await TeamData.find({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id }));
     }
     catch (err) {
         res.status(500).json(err)
@@ -119,7 +119,7 @@ router.get('/submissioninfo', async (req, res) => {
 //get all visible profiles
 router.get('/allvisibleprofiles', async (req, res) => {
     try {
-        res.status(200).json(await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, visible_profile: true }));
+        res.status(200).json(await UserData.find({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, visible_profile: true }));
     }
     catch (err) {
         res.status(500).json(err)

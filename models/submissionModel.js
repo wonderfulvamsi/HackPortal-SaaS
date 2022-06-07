@@ -15,9 +15,9 @@ const submissionSchema = new Schema({
     doc_link: { type: String },
     pics: { type: Array },
     comments: { type: Array }, // a array of json with comment & author as feilds
-    judge_coin: { type: Number },
-    competitor_coin: { type: Number },
-    people_coin: { type: Number }
+    judge_coin: { type: Number, default: 0 },
+    competitor_coin: { type: Number, default: 0 },
+    people_coin: { type: Number, default: 0 }
 }
 );
 

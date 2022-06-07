@@ -6,6 +6,8 @@ let UserData = require('../models/userModel');
 
 let EventData = require('../models/eventModel');
 
+let TeamData = require('../models/teamModel');
+
 require('dotenv').config();
 
 //Signup
@@ -28,6 +30,33 @@ router.post('/newuser', async (req, res) => {
 router.get('/userinfo', async (req, res) => {
     try {
         res.status(200).json(await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, user_wallet_id: req.body.user_wallet_id }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+//add a team 
+router.post('/addteam', async (req, res) => {
+    //check if the team is registered before
+    try {
+        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        if (event.teams.includes(req.body.team_leader_wallet_id)) {
+            res.status(200).send("Team already exists")
+        }
+        else {
+            let updatedteams = event.teams;
+            updatedteams.push(req.body.team_leader_wallet_id)
+            await event.updateOne({ teams: updatedteams });
+            const newteam = new TeamData({
+                organizer_wallet_id: req.body.organizer_wallet_id,
+                event_name: req.body.event_name,
+                team_name: req.body.team_name,
+                team_leader_wallet_id: req.body.team_leader_wallet_id,
+                teammates_wallet_ids: req.body.teammates_wallet_ids,
+            });
+            res.status(200).json(await newteam.save())
+        }
     }
     catch (err) {
         res.status(500).json(err)
@@ -60,7 +89,7 @@ router.post('/addsubmission', async (req, res) => {
             res.status(200).json(await newsubmission.save())
         }
         else {
-            res.status(200).json("Enter valid team lead wallet id")
+            res.status(200).send("Enter valid team lead wallet id")
         }
     }
     catch (err) {
@@ -110,8 +139,11 @@ router.patch('/addjudge', async (req, res) => {
     try {
         const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
         let newjudge_coin_holders = event.judge_coin_holders;
-        newjudge_coin_holders.push(req.body.newjudge);
+        let updatedjudges = event.teams;
+        updatedjudges.push(req.body.newjudge);
+        newjudge_coin_holders.push(req.body.newjudge_wallet_id);
         res.status(200).json(await event.updateOne({
+            judges: updatedjudges,
             judge_coin_holders: newjudge_coin_holders
         }));
     }
@@ -156,7 +188,7 @@ router.patch('/makevisible', async (req, res) => {
         const curruser = await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, user_wallet_id: req.body.user_wallet_id });
         res.status(200).json(await curruser.updateOne({
             need_team: req.body.need_team,
-            visible_profile: req.body.visible_profile,
+            visible_profile: true,
             user_name: req.body.user_name,
             institute: req.body.institute,
             mobileno: req.body.mobileno,
