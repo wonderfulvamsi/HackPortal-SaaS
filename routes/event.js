@@ -43,6 +43,22 @@ router.post('/create', async (req, res) => {
     }
 })
 
+//add event address
+router.patch('/addeventaddress', async (req, res) => {
+    try {
+        const event = await EventData.findOne({ _id: req.body.event_id });
+        res.status(200).json(await event.updateOne(
+            {
+                event_address: req.body.event_address
+            }
+        ))
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+
 //update event 
 router.patch('/updateevent', async (req, res) => {
     try {
