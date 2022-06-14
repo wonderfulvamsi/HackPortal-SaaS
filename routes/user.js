@@ -13,13 +13,16 @@ require('dotenv').config();
 //Signup
 router.post('/newuser', async (req, res) => {
     try {
-        const newuser = new UserData({
-            organizer_wallet_id: req.body.organizer_wallet_id,
-            event_name: req.body.event_name,
-            user_wallet_id: req.body.user_wallet_id,
-            user_type: req.body.user_type,
-        });
-        res.status(200).json(await newuser.save())
+        if (await UserData.findOne({ user_wallet_id: req.body.user_wallet_id })) {
+            res.status(200).json("Account exists")
+        }
+        else {
+            const newuser = new UserData({
+                user_wallet_id: req.body.user_wallet_id
+            });
+            res.status(200).json(await newuser.save())
+        }
+
     }
     catch (err) {
         res.status(500).json(err)
@@ -29,7 +32,26 @@ router.post('/newuser', async (req, res) => {
 //get user profile
 router.get('/userinfo', async (req, res) => {
     try {
-        res.status(200).json(await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, user_wallet_id: req.body.user_wallet_id }));
+        res.status(200).json(await UserData.findOne({ user_wallet_id: req.body.user_wallet_id }));
+    }
+    catch (err) {
+        res.status(500).json(err)
+    }
+})
+
+//join an event 
+router.post('/joinevent', async (req, res) => {
+    //check if the user is already in the event 
+    try {
+        const user = await UserData.findOne({ user_wallet_id: req.body.user_wallet_id });
+        if (user.events.includes(req.body.event_id)) {
+            res.status(200).send("Already in the event")
+        }
+        else {
+            let updatedevents = user.events;
+            updatedevents.push(req.body.event_id)
+            res.status(200).json(await user.updateOne({ events: updatedevents }));
+        }
     }
     catch (err) {
         res.status(500).json(err)
@@ -40,7 +62,7 @@ router.get('/userinfo', async (req, res) => {
 router.post('/addteam', async (req, res) => {
     //check if the team is registered before
     try {
-        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        const event = await EventData.findOne({ _id: req.body.event_id });
         if (event.teams.includes(req.body.team_leader_wallet_id)) {
             res.status(200).send("Team already exists")
         }
@@ -49,8 +71,7 @@ router.post('/addteam', async (req, res) => {
             updatedteams.push(req.body.team_leader_wallet_id)
             await event.updateOne({ teams: updatedteams });
             const newteam = new TeamData({
-                organizer_wallet_id: req.body.organizer_wallet_id,
-                event_name: req.body.event_name,
+                event_id: req.body.event_id,
                 team_name: req.body.team_name,
                 team_leader_wallet_id: req.body.team_leader_wallet_id,
                 teammates_wallet_ids: req.body.teammates_wallet_ids,
@@ -67,15 +88,16 @@ router.post('/addteam', async (req, res) => {
 router.post('/addsubmission', async (req, res) => {
     //check if the user is registered before they make a submission
     try {
-        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        const event = await EventData.findOne({ _id: req.body.event_id });
         if (event.teams.includes(req.body.team_leader_wallet_id)) {
             const newsubmission = new SubmissionData({
-                organizer_wallet_id: req.body.organizer_wallet_id,
-                event_name: req.body.event_name,
+                event_id: req.body.event_id,
                 team_name: req.body.team_name,
                 team_leader_wallet_id: req.body.team_leader_wallet_id,
                 teammates_wallet_ids: req.body.teammates_wallet_ids,
                 team_logo: req.body.team_logo,
+                proj_name: req.body.proj_name,
+                proj_disc: req.body.proj_disc,
                 live_link: req.body.live_link,
                 repo_link: req.body.repo_link,
                 video_link: req.body.video_link,
@@ -101,8 +123,10 @@ router.post('/addsubmission', async (req, res) => {
 //update submission
 router.patch('/updatesubmission', async (req, res) => {
     try {
-        const submission = await SubmissionData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, team_leader_wallet_id: req.body.team_leader_wallet_id });
+        const submission = await SubmissionData.findOne({ event_id: req.body.event_id, team_leader_wallet_id: req.body.team_leader_wallet_id });
         res.status(200).json(await submission.updateOne({
+            proj_name: req.body.proj_name,
+            proj_disc: req.body.proj_disc,
             team_logo: req.body.team_logo,
             live_link: req.body.live_link,
             repo_link: req.body.repo_link,
@@ -119,7 +143,7 @@ router.patch('/updatesubmission', async (req, res) => {
 //vote && comment for a submission
 router.patch('/votencmt', async (req, res) => {
     try {
-        const submission = await SubmissionData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, team_leader_wallet_id: req.body.team_leader_wallet_id });
+        const submission = await SubmissionData.findOne({ event_id: req.body.event_id, team_leader_wallet_id: req.body.team_leader_wallet_id });
         let updatedcmt = submission.comments;
         updatedcmt.push(req.body.comments);
         res.status(200).json(await submission.updateOne({
@@ -137,7 +161,7 @@ router.patch('/votencmt', async (req, res) => {
 //adding users to judge coin holders list         
 router.patch('/addjudge', async (req, res) => {
     try {
-        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        const event = await EventData.findOne({ _id: req.body.event_id });
         let newjudge_coin_holders = event.judge_coin_holders;
         let updatedjudges = event.teams;
         updatedjudges.push(req.body.newjudge);
@@ -155,7 +179,7 @@ router.patch('/addjudge', async (req, res) => {
 //adding users to competitor coin holders list
 router.patch('/addcompetitor', async (req, res) => {
     try {
-        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        const event = await EventData.findOne({ _id: req.body.event_id });
         let newcompetitor_coin_holders = event.competitor_coin_holders;
         newcompetitor_coin_holders.push(req.body.newcompetitor);
         res.status(200).json(await event.updateOne({
@@ -170,7 +194,7 @@ router.patch('/addcompetitor', async (req, res) => {
 //adding users to people coin holders list 
 router.patch('/addpeople', async (req, res) => {
     try {
-        const event = await EventData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id });
+        const event = await EventData.findOne({ _id: req.body.event_id });
         let newpeople_coin_holders = event.people_coin_holders;
         newpeople_coin_holders.push(req.body.newpeople);
         res.status(200).json(await event.updateOne({
@@ -185,7 +209,7 @@ router.patch('/addpeople', async (req, res) => {
 //creating a visible profile
 router.patch('/makevisible', async (req, res) => {
     try {
-        const curruser = await UserData.findOne({ event_name: req.body.event_name, organizer_wallet_id: req.body.organizer_wallet_id, user_wallet_id: req.body.user_wallet_id });
+        const curruser = await UserData.findOne({ event_id: req.body.event_id, user_wallet_id: req.body.user_wallet_id });
         res.status(200).json(await curruser.updateOne({
             need_team: req.body.need_team,
             visible_profile: true,

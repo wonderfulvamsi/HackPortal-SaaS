@@ -3,8 +3,7 @@ const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
 
 const userSchema = new Schema({
-    organizer_wallet_id: { type: String, required: true },
-    event_name: { type: String, required: true },
+    events: { type: Array },
     user_wallet_id: { type: String, required: true, unique: true },
     user_type: { type: String },
     need_team: { type: Boolean, default: false },
