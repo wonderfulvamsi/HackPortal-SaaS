@@ -23,7 +23,7 @@ const uploadFile = async (file) => {
     const uploadParams = {
         Bucket: bucketname,
         Body: fileStream,
-        Key: file.filename
+        Key: file.filename + Date()
     }
 
     const resultfromawss3 = await s3.upload(uploadParams).promise()

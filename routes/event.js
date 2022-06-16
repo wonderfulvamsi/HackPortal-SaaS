@@ -11,8 +11,14 @@ let SubmissionData = require('../models/submissionModel');
 require('dotenv').config();
 
 //get event info
-router.get('/info', async (req, res) => {
-    res.status(200).json(await EventData.findOne({ _id: req.body.event_id }));
+router.get('/info/:event_id', async (req, res) => {
+    const { event_id } = req.params;
+    try {
+        res.status(200).json(await EventData.findOne({ _id: event_id }));
+    }
+    catch (err) {
+        res.status(500).json(err);
+    }
 })
 
 //create an event
@@ -101,9 +107,10 @@ router.delete('/delevent', async (req, res) => {
 })
 
 //get all teams of an event
-router.get('/allteams', async (req, res) => {
+router.get('/allteams/:event_id', async (req, res) => {
+    const { event_id } = req.params;
     try {
-        res.status(200).json(await TeamData.find({ event_id: req.body.event_id }));
+        res.status(200).json(await TeamData.find({ event_id: event_id }));
     }
     catch (err) {
         res.status(500).json(err)
@@ -111,9 +118,10 @@ router.get('/allteams', async (req, res) => {
 })
 
 //get team info
-router.get('/teaminfo', async (req, res) => {
+router.get('/teaminfo/:event_id/:team_leader_wallet_id', async (req, res) => {
+    const { event_id, team_leader_wallet_id } = req.params;
     try {
-        res.status(200).json(await TeamData.findOne({ event_id: req.body.event_id, team_leader_wallet_id: req.body.team_leader_wallet_id }));
+        res.status(200).json(await TeamData.findOne({ event_id: event_id, team_leader_wallet_id: team_leader_wallet_id }));
     }
     catch (err) {
         res.status(500).json(err)
@@ -122,8 +130,9 @@ router.get('/teaminfo', async (req, res) => {
 
 //get all submissions
 router.get('/allsubmissions', async (req, res) => {
+    const { event_id } = req.params;
     try {
-        res.status(200).json(await SubmissionData.find({ event_id: req.body.event_id }));
+        res.status(200).json(await SubmissionData.find({ event_id: event_id }));
     }
     catch (err) {
         res.status(500).json(err)
@@ -131,9 +140,10 @@ router.get('/allsubmissions', async (req, res) => {
 })
 
 //get a submission
-router.get('/submissioninfo', async (req, res) => {
+router.get('/submissioninfo/:event_id/:team_leader_wallet_id', async (req, res) => {
+    const { event_id, team_leader_wallet_id } = req.params;
     try {
-        res.status(200).json(await SubmissionData.findOne({ event_id: req.body.event_id, team_leader_wallet_id: req.body.team_leader_wallet_id }));
+        res.status(200).json(await SubmissionData.findOne({ event_id: event_id, team_leader_wallet_id: team_leader_wallet_id }));
     }
     catch (err) {
         res.status(500).json(err)
@@ -141,9 +151,11 @@ router.get('/submissioninfo', async (req, res) => {
 })
 
 //get all visible profiles
-router.get('/allvisibleprofiles', async (req, res) => {
+router.get('/allvisibleprofiles/:event_id', async (req, res) => {
+    const { event_id } = req.params;
+    const event = await EventData.findOne({ _id: event_id });
     try {
-        res.status(200).json(await UserData.find({ events: req.body.event_id, visible_profile: true }));
+        res.status(200).json(await UserData.find({ events: event, visible_profile: true }));
     }
     catch (err) {
         res.status(500).json(err)

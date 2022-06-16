@@ -5,7 +5,6 @@ const Schema = mongoose.Schema;
 const userSchema = new Schema({
     events: { type: Array },
     user_wallet_id: { type: String, required: true, unique: true },
-    user_type: { type: String },
     need_team: { type: Boolean, default: false },
     visible_profile: { type: Boolean, default: false },
     user_name: { type: String },

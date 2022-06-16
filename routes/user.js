@@ -13,8 +13,9 @@ require('dotenv').config();
 //Signup
 router.post('/newuser', async (req, res) => {
     try {
-        if (await UserData.findOne({ user_wallet_id: req.body.user_wallet_id })) {
-            res.status(200).json("Account exists")
+        const curr = await UserData.findOne({ user_wallet_id: req.body.user_wallet_id });
+        if (curr) {
+            res.status(200).json(curr)
         }
         else {
             const newuser = new UserData({
@@ -22,7 +23,6 @@ router.post('/newuser', async (req, res) => {
             });
             res.status(200).json(await newuser.save())
         }
-
     }
     catch (err) {
         res.status(500).json(err)
@@ -30,9 +30,10 @@ router.post('/newuser', async (req, res) => {
 })
 
 //get user profile
-router.get('/userinfo', async (req, res) => {
+router.get('/userinfo/:user_wallet_id', async (req, res) => {
+    const { user_wallet_id } = req.params
     try {
-        res.status(200).json(await UserData.findOne({ user_wallet_id: req.body.user_wallet_id }));
+        res.status(200).json(await UserData.findOne({ user_wallet_id: user_wallet_id }));
     }
     catch (err) {
         res.status(500).json(err)
@@ -44,12 +45,13 @@ router.post('/joinevent', async (req, res) => {
     //check if the user is already in the event 
     try {
         const user = await UserData.findOne({ user_wallet_id: req.body.user_wallet_id });
-        if (user.events.includes(req.body.event_id)) {
-            res.status(200).send("Already in the event")
+        const event = await EventData.findOne({ _id: req.body.event_id });
+        if (user.events.includes(event)) {
+            res.status(200).json("Already in the event")
         }
         else {
             let updatedevents = user.events;
-            updatedevents.push(req.body.event_id)
+            updatedevents.push(event)
             res.status(200).json(await user.updateOne({ events: updatedevents }));
         }
     }
@@ -209,7 +211,7 @@ router.patch('/addpeople', async (req, res) => {
 //creating a visible profile
 router.patch('/makevisible', async (req, res) => {
     try {
-        const curruser = await UserData.findOne({ event_id: req.body.event_id, user_wallet_id: req.body.user_wallet_id });
+        const curruser = await UserData.findOne({ user_wallet_id: req.body.user_wallet_id });
         res.status(200).json(await curruser.updateOne({
             need_team: req.body.need_team,
             visible_profile: true,
