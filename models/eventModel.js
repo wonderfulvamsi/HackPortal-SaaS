@@ -6,7 +6,7 @@ const eventSchema = new Schema({
     event_address: { type: String },
     organizer_wallet_id: { type: String, required: true },
     event_name: { type: String, required: true, unique: true },
-    event_logo: { type: String, required: true },
+    event_logo: { type: String, },
     submission_date: { type: Date, required: true },
     end_date: { type: Date, required: true },
     event_wall_pic: { type: String },
