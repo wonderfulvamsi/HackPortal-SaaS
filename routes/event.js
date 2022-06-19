@@ -129,7 +129,7 @@ router.get('/teaminfo/:event_id/:team_leader_wallet_id', async (req, res) => {
 })
 
 //get all submissions
-router.get('/allsubmissions', async (req, res) => {
+router.get('/allsubmissions/:event_id', async (req, res) => {
     const { event_id } = req.params;
     try {
         res.status(200).json(await SubmissionData.find({ event_id: event_id }));
